@@ -1,8 +1,6 @@
 package com.example.among.chatting;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,14 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +23,7 @@ import com.example.among.chatting.model.Chat;
 import com.example.among.chatting.model.Message;
 import com.example.among.chatting.model.PhotoMessage;
 import com.example.among.chatting.model.TextMessage;
-import com.example.among.chatting.model.User;
+import com.example.among.chatting.model.UserChat;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -411,7 +406,7 @@ public class ChatActivity extends AppCompatActivity {
             message.setChatId(mChatId);
             message.setMessageId(messageId);
             message.setMessageType(mMessageType);
-            message.setMessageUser(new User(firebaseUser.getUid(), firebaseUser.getEmail(),
+            message.setMessageUserChat(new UserChat(firebaseUser.getUid(), firebaseUser.getEmail(),
                     firebaseUser.getDisplayName(), firebaseUser.getPhotoUrl().toString()));
             message.setReadUserList(Arrays.asList(new String[]{firebaseUser.getUid()}));
             String[] uids = getIntent().getExtras().getStringArray("uids"); // 신규 방인 경우에만
@@ -432,7 +427,7 @@ public class ChatActivity extends AppCompatActivity {
                         public void onComplete(@Nullable final DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                             Iterator<DataSnapshot> memberIterator = dataSnapshot.getChildren().iterator();
                             while (memberIterator.hasNext()) {
-                                User chatMember = memberIterator.next().getValue(User.class); //user 정보 꺼내오기
+                                UserChat chatMember = memberIterator.next().getValue(UserChat.class); //user 정보 꺼내오기
 
                                 mUserRef
                                             .child(chatMember.getUid())
@@ -507,7 +502,7 @@ public class ChatActivity extends AppCompatActivity {
                 mUserRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                        User member = dataSnapshot.getValue(User.class);
+                        UserChat member = dataSnapshot.getValue(UserChat.class);
                                 //firebase db에 있는 정보 User 형으로 가져오기
                            /* titleBuffer.append(member.getName());
                             titleBuffer.append(",");*/

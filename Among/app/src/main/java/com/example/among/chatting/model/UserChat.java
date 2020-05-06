@@ -1,16 +1,16 @@
 package com.example.among.chatting.model;
 
-public class User {
+public class UserChat {
     private String uid;
     private String email;
     private String name;
     private String profileUrl;
     private boolean selection;
 
-    public User(){
+    public UserChat(){
 
     }
-    public User(String uid,String email,String name,String profileUrl){
+    public UserChat(String uid, String email, String name, String profileUrl){
         this.uid=uid;
         this.email=email;
         this.name=name;

@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.among.R;
-import com.example.among.chatting.model.User;
+import com.example.among.chatting.model.UserChat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -118,7 +118,7 @@ public class FriendFragment extends Fragment {
                 new RecyclerViewItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        final User friend = friendsListAdapter.getItem(position);
+                        final UserChat friend = friendsListAdapter.getItem(position);
                         //유저의 정보를 가져와서 Snackbar를 통해 메시지 띄움
                         if (friendsListAdapter.getSelectionMode() == friendsListAdapter.UNSELECTION_MODE) {
                             //final User friend = friendsListAdapter.getItem(position);
@@ -182,8 +182,8 @@ public class FriendFragment extends Fragment {
                 Iterable<DataSnapshot> friendsIterable = dataSnapshot.getChildren();
                 Iterator<DataSnapshot> friendsIterator = friendsIterable.iterator();
                 while(friendsIterator.hasNext()) {//데이터가 있다면
-                    User user = friendsIterator.next().getValue(User.class);
-                    if (user.getEmail().equals(inputEmail)) {
+                    UserChat userChat = friendsIterator.next().getValue(UserChat.class);
+                    if (userChat.getEmail().equals(inputEmail)) {
                         Snackbar.make(searchArea, "이미 등록된 친구입니다.", Snackbar.LENGTH_SHORT).show();
                         return;
                     }
@@ -199,19 +199,19 @@ public class FriendFragment extends Fragment {
 
                         while(userIterator.hasNext()){
                             //현재 가리키고 있는 user의 정보
-                            final User currenUser = userIterator.next().getValue(User.class);
+                            final UserChat currenUserChat = userIterator.next().getValue(UserChat.class);
                             //유저에 실제 존재하는 사람인지 확인
-                            if(inputEmail.equals(currenUser.getEmail())){
+                            if(inputEmail.equals(currenUserChat.getEmail())){
                                 //친구 등록 로직
-                                friendsDBRef.push().setValue(currenUser, new DatabaseReference.CompletionListener() {
+                                friendsDBRef.push().setValue(currenUserChat, new DatabaseReference.CompletionListener() {
                                     @Override
                                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                                         //친구가 정상적으로 등록되었다면 상대방을 등록 + 나의 정보 등록
                                         userDBRef.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                User user = dataSnapshot.getValue(User.class);
-                                                userDBRef.child(currenUser.getUid()).child("friends").push().setValue(user);
+                                                UserChat userChat = dataSnapshot.getValue(UserChat.class);
+                                                userDBRef.child(currenUserChat.getUid()).child("friends").push().setValue(userChat);
                                                 Snackbar.make(searchArea, "친구 등록이 완료되었습니다.", Snackbar.LENGTH_SHORT).show();
                                             }
 
@@ -258,7 +258,7 @@ public class FriendFragment extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 //추가
-                 User friend = dataSnapshot.getValue(User.class);
+                 UserChat friend = dataSnapshot.getValue(UserChat.class);
                  drawUI(friend);
             }
 
@@ -283,7 +283,7 @@ public class FriendFragment extends Fragment {
             }
         });
     }
-    private void drawUI(User friend){
+    private void drawUI(UserChat friend){
         friendsListAdapter.addItem(friend);
 
     }

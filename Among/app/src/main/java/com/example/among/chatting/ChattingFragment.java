@@ -19,7 +19,7 @@ import com.example.among.chatting.model.Chat;
 import com.example.among.chatting.model.ExitMessage;
 import com.example.among.chatting.model.Message;
 import com.example.among.chatting.model.Notification;
-import com.example.among.chatting.model.User;
+import com.example.among.chatting.model.UserChat;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -122,7 +122,7 @@ public class ChattingFragment extends Fragment {
                     if(updatedChat.getLastMessage().getMessageType()== Message.MessageType.EXIT){
                         return;
                     }
-                    if ( !updatedChat.getLastMessage().getMessageUser().getUid().equals(firebaseUser.getUid())) {
+                    if ( !updatedChat.getLastMessage().getMessageUserChat().getUid().equals(firebaseUser.getUid())) {
                         // 현재 그 방에 들어가 있지 않을 때
                         if ( !updatedChat.getChatId().equals(JOINED_ROOM)) {
                             // 노티피케이션 알림
@@ -130,7 +130,7 @@ public class ChattingFragment extends Fragment {
                             chatIntent.putExtra("chat_Id", updatedChat.getChatId());
                             notification
                                     .setData(chatIntent)
-                                    .setTitle(updatedChat.getLastMessage().getMessageUser().getName())
+                                    .setTitle(updatedChat.getLastMessage().getMessageUserChat().getName())
                                     .setText(updatedChat.getLastMessage().getMessageText())
                                     .notification();
 
@@ -187,7 +187,7 @@ public class ChattingFragment extends Fragment {
 
                 int loopCount = 1;
                 while( memberIterator.hasNext()) {
-                    User member = memberIterator.next().getValue(User.class);
+                    UserChat member = memberIterator.next().getValue(UserChat.class);
                     if ( !firebaseUser.getUid().equals(member.getUid())) {
                         memberStringBuffer.append(member.getName());
                         if ( memberCount - loopCount > 1 ) {
@@ -237,7 +237,7 @@ public class ChattingFragment extends Fragment {
                         final ExitMessage exitMessage = new ExitMessage();
                         String messageId = messageRef.push().getKey();
 
-                        exitMessage.setMessageUser(new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),firebaseUser.getPhotoUrl().toString()));
+                        exitMessage.setMessageUserChat(new UserChat(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),firebaseUser.getPhotoUrl().toString()));
                         exitMessage.setMessageDate(new Date());
                         exitMessage.setMessageId(messageId);
                         exitMessage.setChatId(chat.getChatId());
@@ -261,7 +261,7 @@ public class ChattingFragment extends Fragment {
                                                        Iterator<DataSnapshot> chatMemberIterator = dataSnapshot.getChildren().iterator();
 
                                                        while ( chatMemberIterator.hasNext()) {
-                                                           User chatMember = chatMemberIterator.next().getValue(User.class);
+                                                           UserChat chatMember = chatMemberIterator.next().getValue(UserChat.class);
 
                                                            // chats -> {uid} -> {chat_id} - { ... }
                                                            firebaseDB
@@ -308,7 +308,7 @@ public class ChattingFragment extends Fragment {
 
                                                while( memberIterator.hasNext()) {
                                                    // 방 참여자의 UID를 가져오기 위하여 user 정보 조회
-                                                   User chatMember = memberIterator.next().getValue(User.class);
+                                                   UserChat chatMember = memberIterator.next().getValue(UserChat.class);
                                                    // 해당 참여자의 방 정보의 업데이트를 위하여 방이름을 임의로 업데이트 진행
                                                    firebaseDB.getReference("users")
                                                            .child(chatMember.getUid())

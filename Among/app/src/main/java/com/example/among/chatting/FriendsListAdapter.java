@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.among.R;
-import com.example.among.chatting.model.User;
+import com.example.among.chatting.model.UserChat;
 
 import java.util.ArrayList;
 
@@ -19,11 +19,11 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     public static final int UNSELECTION_MODE =1;
     public static final int SELECTION_MODE =2;
     private int selectionMode = UNSELECTION_MODE;
-    private ArrayList<User> friendList;
+    private ArrayList<UserChat> friendList;
     public FriendsListAdapter(){
         friendList = new ArrayList<>();
     }
-    public void addItem(User friend){
+    public void addItem(UserChat friend){
         friendList.add(friend);
         notifyDataSetChanged(); // View 갱신
     }
@@ -37,8 +37,8 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     }
     public int getSelectUserCount(){
         int selectionCount=0;
-        for (User user :friendList){
-            if (user.isSelection()){
+        for (UserChat userChat :friendList){
+            if (userChat.isSelection()){
                 selectionCount++;
             }
         }
@@ -47,14 +47,14 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     public String[] getSelectedUids(){
         String[] selectedUids = new String[getSelectUserCount()];
         int i =0;
-        for (User user :friendList){
-            if (user.isSelection()){
-                selectedUids[i++] = user.getUid();
+        for (UserChat userChat :friendList){
+            if (userChat.isSelection()){
+                selectedUids[i++] = userChat.getUid();
             }
         }
         return selectedUids;
     }
-    public User getItem(int position){
+    public UserChat getItem(int position){
         return this.friendList.get(position);
     }
     @NonNull
@@ -69,7 +69,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     @Override
     public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
         //GetView...
-        final User friend = getItem(position);
+        final UserChat friend = getItem(position);
         holder.emailView.setText(friend.getEmail());
         holder.nameView.setText(friend.getName());
        if(getSelectionMode()==UNSELECTION_MODE){

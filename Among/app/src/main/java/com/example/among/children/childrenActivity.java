@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -49,7 +50,8 @@ public class childrenActivity extends AppCompatActivity {
 
         //앱바
         toolbar=findViewById(R.id.toolbarChild);
-        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitle("");
+        //toolbar.setTitleTextColor(Color.RED);
         setSupportActionBar(toolbar);
         getSupportActionBar();
 
@@ -164,12 +166,19 @@ public class childrenActivity extends AppCompatActivity {
             EditText input = inputAlert.findViewById(R.id.input);
             String data = input.getText().toString();
 
-            Intent intent = new Intent(childrenActivity.this, FamilychatMainActivity.class);
+            String familyRoomName = "황가네";
 
-            //intent에 공유할 데이터 저장
-            intent.putExtra("Chatrooms",
-                    data);
-            startActivity(intent);
+
+                Intent intent = new Intent(childrenActivity.this, FamilychatMainActivity.class);
+                //intent에 공유할 데이터 저장
+                intent.putExtra("Chatrooms", data);
+                if(data.equals(familyRoomName)){
+                    startActivity(intent);
+                }else {
+                    Toast.makeText(childrenActivity.this, "등록된 가족방이 없습니다.", Toast.LENGTH_SHORT).show();
+
+                }
+
 
         }
     }

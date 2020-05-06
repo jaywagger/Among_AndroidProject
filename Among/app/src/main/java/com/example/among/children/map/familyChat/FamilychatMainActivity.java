@@ -133,11 +133,11 @@ public class FamilychatMainActivity extends AppCompatActivity implements
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
             if("com.example.among.children.map.services.LocationService".equals(service.service.getClassName())) {
-                Log.d(TAG, "isLocationServiceRunning: location service is already running.");
+                Log.d(TAG, "isLocationServiceRunning: 위치 서비스 실행 중.");
                 return true;
             }
         }
-        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        Log.d(TAG, "isLocationServiceRunning: 위치 서비스 실행 X");
         return false;
     }
 
@@ -219,9 +219,9 @@ public class FamilychatMainActivity extends AppCompatActivity implements
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+        builder.setMessage("이 서비스는 GPS가 켜져야 합니다. 기능을 키겠습니까?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("네", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
@@ -402,7 +402,7 @@ public class FamilychatMainActivity extends AppCompatActivity implements
                     navChatroomActivity(chatroom);
                 }else{
                     View parentLayout = findViewById(android.R.id.content);
-                    Snackbar.make(parentLayout, "Something went wrong.", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parentLayout, "오류발생", Snackbar.LENGTH_SHORT).show();
                 }
             }
         });

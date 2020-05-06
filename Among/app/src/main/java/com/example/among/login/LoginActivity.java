@@ -1,7 +1,5 @@
 package com.example.among.login;
 
-import android.app.Activity;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -9,7 +7,6 @@ import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -30,11 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.among.R;
-import com.example.among.chatting.ChatLogActivity;
-import com.example.among.chatting.model.User;
+import com.example.among.chatting.model.UserChat;
 import com.example.among.children.childrenActivity;
-import com.example.among.function.FunctionActivity;
-import com.example.among.parents.FCMActivity;
+import com.example.among.children.map.familyChat.UserClient;
 import com.example.among.parents.Parents;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -56,15 +51,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 import okhttp3.MediaType;
@@ -86,6 +81,8 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference UserRef;
     private static int GOOGLE_LOGIN_OPEN = 100;
+    //Firebase
+    private FirebaseAuth.AuthStateListener mAuthListener;
     SQLiteDatabase db;
     DBHandler handler;
     MemberDTO member;
@@ -104,6 +101,7 @@ public class LoginActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         firebaseUser =FirebaseAuth.getInstance().getCurrentUser();
         UserRef = database.getReference("users");
+        setupFirebaseAuth();
 
 
 
@@ -139,11 +137,26 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-        if(auth.getCurrentUser()!=null){
+        /*if(auth.getCurrentUser()!=null){
             Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
             intent.putExtra("userID",firebaseUser.getEmail());
             startActivity(intent);
             finish();
+            return;
+        }*/
+        if(auth.getCurrentUser()!=null){
+            Log.d("msg",mode+"자동로그인");
+            if(mode==0){
+                Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
+                intent.putExtra("userID",firebaseUser.getEmail());
+                startActivity(intent);
+                finish();
+            }else if(mode==1){
+                Intent intent = new Intent(LoginActivity.this, Parents.class);
+                intent.putExtra("userID",firebaseUser.getEmail());
+                startActivity(intent);
+                finish();
+            }
             return;
         }
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
@@ -228,17 +241,7 @@ public class LoginActivity extends AppCompatActivity {
                         passwordEditText.getText().toString());*/
             }
         });
-       /* if(auth.getCurrentUser()!=null){
-            if(mode==0){
-                Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
-                intent.putExtra("userID",UserRef.r.getUid());
-                finish();
-            }else{
-                startActivity(new Intent(LoginActivity.this,Parents.class));
-                finish();
-            }
-            return;
-        }*/
+
     }
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -271,7 +274,7 @@ public class LoginActivity extends AppCompatActivity {
                 object.put("userID",memberDTOS[0].getUserID());
                 object.put("password",memberDTOS[0].getPassword());
 
-                url = new URL("http://192.168.0.56:8088/among/member/login.do");
+                url = new URL("http://70.12.224.100:8088/among/member/login.do");
 
 
                 OkHttpClient client = new OkHttpClient();
@@ -304,6 +307,7 @@ public class LoginActivity extends AppCompatActivity {
                 intent.putExtra("userID",userID);
                 startActivity(intent);
                 finish();
+
                 Log.d("msg","자녀");
             }else if(s.equals("true")&mode==1){
                 //부모님단 모드
@@ -346,18 +350,18 @@ public class LoginActivity extends AppCompatActivity {
                                     //isSuccessful : 성공을 했을 경우에만 실행
                                     if (task.isSuccessful()) {
                                         FirebaseUser firebaseUser = task.getResult().getUser();
-                                        final User user = new User();
-                                        user.setEmail(firebaseUser.getEmail());
-                                        user.setName(firebaseUser.getDisplayName());
-                                        user.setUid(firebaseUser.getUid());
+                                        final UserChat userChat = new UserChat();
+                                        userChat.setEmail(firebaseUser.getEmail());
+                                        userChat.setName(firebaseUser.getDisplayName());
+                                        userChat.setUid(firebaseUser.getUid());
                                         if (firebaseUser.getPhotoUrl()!=null){
-                                            user.setProfileUrl(firebaseUser.getPhotoUrl().toString());}
-                                        UserRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            userChat.setProfileUrl(firebaseUser.getPhotoUrl().toString());}
+                                        UserRef.child(userChat.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 if(!dataSnapshot.exists()){
                                                     //데이터가 존재하지 않을 때만 셋팅
-                                                    UserRef.child(user.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
+                                                    UserRef.child(userChat.getUid()).setValue(userChat, new DatabaseReference.CompletionListener() {
                                                         @Override
                                                         public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                                                             //정상적으로 Complete가 된 경우에만 Log를 쌓는다.
@@ -365,11 +369,17 @@ public class LoginActivity extends AppCompatActivity {
                                                                 //Activity 연결
                                                                 /*startActivity(new Intent(LoginActivity.this, childrenActivity.class));
                                                                 finish();*/
-                                                                Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
-                                                                intent.putExtra("userID",user.getEmail());
-                                                                startActivity(intent);
-                                                                finish();
-
+                                                                if(mode==0){
+                                                                    Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
+                                                                    intent.putExtra("userID", userChat.getEmail());
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                }else {
+                                                                    Intent intent = new Intent(LoginActivity.this, Parents.class);
+                                                                    intent.putExtra("userID", userChat.getEmail());
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                }
                                                             }
                                                         }
                                                     }); //users밑 userID
@@ -377,14 +387,23 @@ public class LoginActivity extends AppCompatActivity {
                                                     //데이터가 존재한다면 바로 Actiivty 호출
                                                    /* startActivity(new Intent(LoginActivity.this, childrenActivity.class));
                                                     finish();*/
-                                                    Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
-                                                    intent.putExtra("userID",user.getEmail());
-                                                    startActivity(intent);
-                                                    finish();
+
+
+                                                    if(mode==0){
+                                                        Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
+                                                        intent.putExtra("userID", userChat.getEmail());
+                                                        startActivity(intent);
+                                                        finish();
+                                                    }else {
+                                                        Intent intent = new Intent(LoginActivity.this, Parents.class);
+                                                        intent.putExtra("userID", userChat.getEmail());
+                                                        startActivity(intent);
+                                                        finish();
+                                                    }
                                                 }
                                                 //로깅
                                                 Bundle eventBundle = new Bundle();
-                                                eventBundle.putString("email",user.getEmail());
+                                                eventBundle.putString("email", userChat.getEmail());
                                                 firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN,eventBundle);
                                             }
 
@@ -405,5 +424,53 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
                 );
+    }
+    /*
+       ----------------------------- Firebase setup ---------------------------------
+    */
+    private void setupFirebaseAuth(){
+        Log.d("파베 셋업", "setupFirebaseAuth: 시작");
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    Log.d("파베 셋업", "onAuthStateChanged:signed_in:" + user.getUid());
+                    Toast.makeText(LoginActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                            .setTimestampsInSnapshotsEnabled(true)
+                            .build();
+                    db.setFirestoreSettings(settings);
+
+                    DocumentReference userRef = db.collection(getString(R.string.collection_users))
+                            .document(user.getUid());
+
+                    userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                Log.d("파베 셋업", "onComplete: successfully set the user client.");
+
+                                com.example.among.children.user.User user = task.getResult().toObject(com.example.among.children.user.User.class);
+                                ((UserClient)(getApplicationContext())).setUser(user);
+                            }
+                        }
+                    });
+
+                    Intent intent = new Intent(LoginActivity.this, childrenActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    // User is signed out
+                    Log.d("파베 셋업", "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
     }
 }

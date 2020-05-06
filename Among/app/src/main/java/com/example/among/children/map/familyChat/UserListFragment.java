@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.among.R;
 import com.example.among.children.map.UserLocation;
 import com.example.among.children.user.User;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -200,7 +201,7 @@ public class UserListFragment extends Fragment implements
                         snippet = "경로 찾기: " + userLocation.getUser().getUsername();
                     }
 
-                    int avatar = R.drawable.cartman_cop; // set the default avatar
+                    int avatar = R.drawable.logo; // set the default avatar
                     try{
                         avatar = Integer.parseInt(userLocation.getUser().getAvatar());
                     }catch (NumberFormatException e){
@@ -239,9 +240,14 @@ public class UserListFragment extends Fragment implements
         double topBoundary = mUserPosition.getGeo_point().getLatitude() + .1;
         double rightBoundary = mUserPosition.getGeo_point().getLongitude() + .1;
 
-        mMapBoundary = new LatLngBounds(
-                new LatLng(bottomBoundary, leftBoundary),
-                new LatLng(topBoundary, rightBoundary)
+
+
+
+        /*LatLng myloc = new LatLng(mUserPosition.getGeo_point().getLatitude(), mUserPosition.getGeo_point().getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(myloc, 14);
+        mGoogleMap.moveCamera(cameraUpdate);*/
+        mMapBoundary = new LatLngBounds(new LatLng(bottomBoundary, leftBoundary),
+                                        new LatLng(topBoundary, rightBoundary)
         );
 
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0));

@@ -89,7 +89,6 @@ public class ChatroomActivity extends AppCompatActivity implements
 
                 if(task.isSuccessful()){
                     if(task.getResult().toObject(UserLocation.class) != null){
-
                         mUserLocations.add(task.getResult().toObject(UserLocation.class));
                     }
                 }
@@ -213,6 +212,7 @@ public class ChatroomActivity extends AppCompatActivity implements
             newChatMessage.setMessage(message);
             newChatMessage.setMessage_id(newMessageDoc.getId());
 
+            //user 가져오기
             User user = ((UserClient)(getApplicationContext())).getUser();
             Log.d(TAG, "insertNewMessage: retrieved user client: " + user.toString());
             newChatMessage.setUser(user);

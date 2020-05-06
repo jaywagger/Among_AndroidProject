@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.among.R;
-import com.example.among.chatting.model.User;
+import com.example.among.chatting.model.UserChat;
 import com.example.among.function.FunctionActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -114,18 +114,18 @@ public class ChatLogActivity extends AppCompatActivity {
                                     //isSuccessful : 성공을 했을 경우에만 실행
                                     if (task.isSuccessful()) {
                                         FirebaseUser firebaseUser = task.getResult().getUser();
-                                        final User user = new User();
-                                        user.setEmail(firebaseUser.getEmail());
-                                        user.setName(firebaseUser.getDisplayName());
-                                        user.setUid(firebaseUser.getUid());
+                                        final UserChat userChat = new UserChat();
+                                        userChat.setEmail(firebaseUser.getEmail());
+                                        userChat.setName(firebaseUser.getDisplayName());
+                                        userChat.setUid(firebaseUser.getUid());
                                         if (firebaseUser.getPhotoUrl()!=null){
-                                            user.setProfileUrl(firebaseUser.getPhotoUrl().toString());}
-                                        UserRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            userChat.setProfileUrl(firebaseUser.getPhotoUrl().toString());}
+                                        UserRef.child(userChat.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 if(!dataSnapshot.exists()){
                                                     //데이터가 존재하지 않을 때만 셋팅
-                                                    UserRef.child(user.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
+                                                    UserRef.child(userChat.getUid()).setValue(userChat, new DatabaseReference.CompletionListener() {
                                                         @Override
                                                         public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                                                             //정상적으로 Complete가 된 경우에만 Log를 쌓는다.
@@ -144,7 +144,7 @@ public class ChatLogActivity extends AppCompatActivity {
                                                 }
                                                 //로깅
                                                 Bundle eventBundle = new Bundle();
-                                                eventBundle.putString("email",user.getEmail());
+                                                eventBundle.putString("email", userChat.getEmail());
                                                 firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN,eventBundle);
                                             }
 

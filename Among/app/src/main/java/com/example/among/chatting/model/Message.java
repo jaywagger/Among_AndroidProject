@@ -6,7 +6,7 @@ import java.util.List;
 public class Message {
     //메시지에 대한 공통 속성
     private String messageId;
-    private User messageUser;
+    private UserChat messageUserChat;
     private String chatId;
     private int unreadCount;
     private Date messageDate;
@@ -26,12 +26,12 @@ public class Message {
         this.messageId = messageId;
     }
 
-    public User getMessageUser() {
-        return messageUser;
+    public UserChat getMessageUserChat() {
+        return messageUserChat;
     }
 
-    public void setMessageUser(User messageUser) {
-        this.messageUser = messageUser;
+    public void setMessageUserChat(UserChat messageUserChat) {
+        this.messageUserChat = messageUserChat;
     }
 
     public String getChatId() {
@@ -78,7 +78,7 @@ public class Message {
     public String toString() {
         return "Message{" +
                 "messageId='" + messageId + '\'' +
-                ", messageUser=" + messageUser +
+                ", messageUser=" + messageUserChat +
                 ", chatId='" + chatId + '\'' +
                 ", unreadCount=" + unreadCount +
                 ", messageDate=" + messageDate +

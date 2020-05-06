@@ -83,7 +83,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
 
         //내가 보낸 메시지인지 받은 메시지인지 판별 필요
-        if (UserId.equals(item.getMessageUser().getUid())){
+        if (UserId.equals(item.getMessageUserChat().getUid())){
             //내가 보낸 메시지 출력
             //텍스트 메시지인지 포토 메시지인지 구별 필요!
             if (item.getMessageType() == Message.MessageType.TEXT){
@@ -122,7 +122,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 holder.rcvImage.setVisibility(View.VISIBLE);
             }else if(item.getMessageType() == Message.MessageType.EXIT){
                 //{이름}님이 나가셨습니다.
-                holder.exitText.setText(item.getMessageUser().getName()+"님이 방에서 나가셨습니다.");
+                holder.exitText.setText(item.getMessageUserChat().getName()+"님이 방에서 나가셨습니다.");
 
             }
             if(item.getUnreadCount()>0){
@@ -130,9 +130,9 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             }else{ //item.getUnreadCount() = 0일때는 칸을 비워준다.
                 holder.sendUnreadCount.setText("");
             }
-            if(item.getMessageUser().getProfileUrl()!=null){
+            if(item.getMessageUserChat().getProfileUrl()!=null){
                 Glide.with(holder.yourChatArea)
-                        .load(item.getMessageUser().getProfileUrl())
+                        .load(item.getMessageUserChat().getProfileUrl())
                         .into(holder.rcvProfileView);
             }
             if(item.getMessageType()==Message.MessageType.EXIT){
